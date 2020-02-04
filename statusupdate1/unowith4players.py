@@ -1,10 +1,19 @@
 import rlcard
 from rlcard.agents.random_agent import RandomAgent
 from rlcard.utils.utils import set_global_seed
-
+'''
+This is a modification of the example code on http://rlcard.org/getting_started.html.
+The original code was rlcard's blackjack example
+I modified it to play uno instead and adjusted the player number and output format.
+Mark Yu
+Feb  4 2020
+'''
 # Make environment
 env = rlcard.make('uno')
 episode_num = 2
+# There is no build in function that can change the player numbers of a game so I checked and changed the status for all dependencies that relevent to the game status and initialization
+env.player_num=4
+env.game.num_players=4
 env.init_game()
 # Set a global seed
 set_global_seed(0)
