@@ -5,12 +5,12 @@ from rlcard.utils.utils import set_global_seed
 # Make environment
 env = rlcard.make('uno')
 episode_num = 2
-players=env.init_game()
+env.init_game()
 # Set a global seed
 set_global_seed(0)
-agents={}
+agents=[]
 # Set up agents
-for i in range(len(players)): 
+for i in range(env.player_num): 
     agents.append( RandomAgent(action_num=env.action_num))
 env.set_agents(agents)
 
@@ -22,5 +22,5 @@ for episode in range(episode_num):
     # Print out the trajectories
     print('\nEpisode {}'.format(episode))
     for ts in trajectories[0]:
-        print('State: {}, Action: {}, Reward: {}, Next State: {}, Done: {}'.format(ts[0], ts[1], ts[2], ts[3], ts[4]))
+        print('Action: {}, Reward: {}, Done: {}'.format( ts[1], ts[2], ts[4]))
         
