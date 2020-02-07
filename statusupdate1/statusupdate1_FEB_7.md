@@ -14,4 +14,6 @@
 
 ## Anything blocking
 > If you can finish my other courses' homework for me, that will be a great help! 36 hours homeworks every week, damn!
-> It seems I will have to use tensorflow to deal with the AI part, and that seems chanllenging.
+> It seems I will have to use tensorflow to deal with the AI part, and that seems challenging.
+
+* A link to this page: [https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate1/statusupdate1_FEB_7.md](https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate1/statusupdate1_FEB_7.md)
