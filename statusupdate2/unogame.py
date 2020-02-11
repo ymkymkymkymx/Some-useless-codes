@@ -1,151 +1,200 @@
-from copy import deepcopy
+import rlcard
+from rlcard.agents.random_agent import RandomAgent
+from rlcard.utils.utils import set_global_seed
 
-from rlcard.games.uno.dealer import UnoDealer as Dealer
-from rlcard.games.uno.player import UnoPlayer as Player
-from rlcard.games.uno.round import UnoRound as Round
-
-
-class UnoGame(object):
-
-    def __init__(self, allow_step_back=False):
-        self.allow_step_back = allow_step_back
-        self.num_players = 2
-        self.payoffs = [0 for _ in range(self.num_players)]
-
+class RlUno(object):
+    def __init__(self, playernum=2,human=0):
+        self.env= rlcard.make('uno')
+        self.env.player_num=playernum
+        self.env.game.num_players=playernum
+        self.human=human
+        
     def init_game(self):
-        ''' Initialize players and state
+        ''' Start a new game
 
         Returns:
             (tuple): Tuple containing:
 
-                (dict): The first state in one game
-                (int): Current player's id
+                (numpy.array): The begining state of the game
+                (int): The begining player
         '''
-        # Initalize payoffs
-        self.payoffs = [0 for _ in range(self.num_players)]
-
-        # Initialize a dealer that can deal cards
-        self.dealer = Dealer()
-
-        # Initialize four players to play the game
-        self.players = [Player(i) for i in range(self.num_players)]
-
-        # Deal 7 cards to each player to prepare for the game
-        for player in self.players:
-            self.dealer.deal_cards(player, 7)
-
-        # Initialize a Round
-        self.round = Round(self.dealer, self.num_players)
-
-        # flip and perfrom top card
-        top_card = self.round.flip_top_card()
-        self.round.perform_top_card(self.players, top_card)
-
-        # Save the hisory for stepping back to the last state.
-        self.history = []
-
-        player_id = self.round.current_player
-        state = self.get_state(player_id)
-        return state, player_id
+        state, player_id = self.game.init_game()
+        return self.extract_state(state), player_id
 
     def step(self, action):
-        ''' Get the next state
+        
 
-        Args:
-            action (str): A specific action
+        return self.env.step(action)
 
-        Returns:
-            (tuple): Tuple containing:
+    def single_agent_step(self, action):
+        
 
-                (dict): next player's state
-                (int): next plater's id
-        '''
+        return self.env.single_agent_step( action)
 
-        if self.allow_step_back:
-            # First snapshot the current state
-            his_dealer = deepcopy(self.dealer)
-            his_round = deepcopy(self.round)
-            his_players = deepcopy(self.players)
-            self.history.append((his_dealer, his_players, his_round))
+    def reset(self):
+        
 
-        self.round.proceed_round(self.players, action)
-        player_id = self.round.current_player
-        state = self.get_state(player_id)
-        return state, player_id
+        return self.env.extract_state(state)
 
     def step_back(self):
-        ''' Return to the previous state of the game
+        
 
-        Returns:
-            (bool): True if the game steps back successfully
-        '''
-        if not self.history:
-            return False
-        self.dealer, self.players, self.round = self.history.pop()
-        return True
-
-    def get_state(self, player_id):
-        ''' Return player's state
-
-        Args:
-            player_id (int): player id
-
-        Returns:
-            (dict): The state of the player
-        '''
-        state = self.round.get_state(self.players, player_id)
-        return state
-
-    def get_payoffs(self):
-        ''' Return the payoffs of the game
-
-        Returns:
-            (list): Each entry corresponds to the payoff of one player
-        '''
-        winner = self.round.winner
-        if winner is not None and len(winner) == 1:
-            self.payoffs[winner[0]] = 1
-            self.payoffs[1 - winner[0]] = -1
-        return self.payoffs
-
-    def get_legal_actions(self):
-        ''' Return the legal actions for current player
-
-        Returns:
-            (list): A list of legal actions
-        '''
-
-        return self.round.get_legal_actions(self.players, self.round.current_player)
-
-    def get_player_num(self):
-        ''' Return the number of players in Limit Texas Hold'em
-
-        Returns:
-            (int): The number of players in the game
-        '''
-        return self.num_players
-
-    @staticmethod
-    def get_action_num():
-        ''' Return the number of applicable actions
-
-        Returns:
-            (int): The number of actions. There are 61 actions
-        '''
-        return 61
+        return self.env.step_back
 
     def get_player_id(self):
-        ''' Return the current player's id
+        ''' Get the current player id
 
         Returns:
-            (int): current player's id
+            (int): the id of the current player
         '''
-        return self.round.current_player
+        return self.env.game.get_player_id()
 
     def is_over(self):
-        ''' Check if the game is over
+        ''' Check whether the curent game is over
 
         Returns:
-            (boolean): True if the game is over
+            (boolean): True is current game is over
         '''
-        return self.round.is_over
+        return self.env.game.is_over()
+
+    def get_state(self, player_id):
+        ''' Get the state given player id
+
+        Args:
+            player_id (int): The player id
+
+        Returns:
+            (numpy.array): The observed state of the player
+        '''
+        return self.env.extract_state(self.game.get_state(player_id))
+
+    def set_agents(self, agents):
+        ''' Set the agents that will interact with the environment
+
+        Args:
+            agents (list): List of Agent classes
+        '''
+       
+
+        self.env.set_agents( agents)
+
+    def run(self, is_training=False, seed=None):
+        ''' Run a complete game, either for evaluation or training RL agent.
+
+        Args:
+            is_training (boolean): True if for training purpose.
+            seed (int): A seed for running the game. For single-process program,
+              the seed should be set to None. For multi-process program, the
+              seed should be asigned for reproducibility.
+
+        Returns:
+            (tuple) Tuple containing:
+
+                (list): A list of trajectories generated from the environment.
+                (list): A list payoffs. Each entry corresponds to one player.
+
+        Note: The trajectories are 3-dimension list. The first dimension is for different players.
+              The second dimension is for different transitions. The third dimension is for the contents of each transiton
+        '''
+        
+
+        return self.env.run(is_training,seed)
+
+    def run_multi(self, task_num, result, is_training=False, seed=None):
+        self.env.run_multi(task_num, result, is_training, seed)
+
+    def set_mode(self, active_player=0, single_agent_mode=False, human_mode=False):
+        ''' Turn on the single-agent-mode. Pretrained models will
+            be loaded to simulate other agents
+
+        Args:
+            active_player (int): The player that does not use pretrained models
+        '''
+        self.env.set_mode(active_player, single_agent_mode, human_mode)
+
+    def print_state(self, player):
+        ''' Print out the state of a given player
+
+        Args:
+            player (int): Player id
+        '''
+        self.env.print_state(player)
+
+    def print_result(self, player):
+        ''' Print the game result when the game is over
+
+        Args:
+            player (int): The human player id
+        '''
+        self.env.print_result(player)
+
+    @staticmethod
+    def print_action(action):
+        ''' Print out an action in a nice form
+
+        Args:
+            action (str): A string a action
+        '''
+        self.env.print_action(action)
+
+    def load_model(self):
+        ''' Load pretrained/rule model
+
+        Returns:
+            model (Model): A Model object
+        '''
+        return self.env.load_model()
+
+    def extract_state(self, state):
+        ''' Extract useful information from state for RL. Must be implemented in the child class.
+
+        Args:
+            state (dict): the raw state
+
+        Returns:
+            (numpy.array): the extracted state
+        '''
+        return self.env.extract_state(state)
+
+    def get_payoffs(self):
+        ''' Get the payoffs of players. Must be implemented in the child class.
+
+        Returns:
+            (list): A list of payoffs for each player.
+
+        Note: Must be implemented in the child class.
+        '''
+        return self.env.get_payoffs()
+
+    def decode_action(self, action_id):
+        ''' Decode Action id to the action in the game.
+
+        Args:
+            action_id (int): The id of the action
+
+        Returns:
+            (string): The action that will be passed to the game engine.
+
+        Note: Must be implemented in the child class.
+        '''
+        return self.env.decode_action(action_id)
+
+    def get_legal_actions(self):
+        ''' Get all legal actions for current state.
+
+        Returns:
+            (list): A list of legal actions' id.
+
+        Note: Must be implemented in the child class.
+        '''
+        return self.env.get_legal_actions()
+    
+    def set_player_number(self,num):
+        '''
+        Set the player number for Uno game, and reinitialize the game
+        Args: 
+             num: the number of player
+        '''
+        self.env.player_num=num
+        self.env.game.num_players=num
+        return self.init_game()
