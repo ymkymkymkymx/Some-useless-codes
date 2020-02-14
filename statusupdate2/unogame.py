@@ -5,9 +5,11 @@ from rlcard.utils.utils import set_global_seed
 class RlUno(object):
     def __init__(self, playernum=2,human=0):
         self.env= rlcard.make('uno')
+        self.player_num=playernum
         self.env.player_num=playernum
         self.env.game.num_players=playernum
         self.human=human
+        self.action_num = self.env.game.get_action_num()
         
     def init_game(self):
         ''' Start a new game
@@ -195,9 +197,61 @@ class RlUno(object):
         Args: 
              num: the number of player
         '''
+        self.player_num=num
         self.env.player_num=num
         self.env.game.num_players=num
         return self.init_game()
-    
+    def get_player_vision(self,id):
+        '''
+        return the things that the player in game should be able to observes in a list of lists of strings
+        infolist[0] stores the cards on the player's hand
+        infolist[1] stores the 'target card'
+        infolist[2] stores the number of cards on each players' hands
+        infolist[3] stores the leagal actions
+        Args:
+            id: the player id you want to get vision of
+        Return:
+              infolist
+        '''
+        info=self.env.game.get_state(id)
+        infolist=[]
+        infolist.append(info['hand'])
+        infolist.append(info['target'])
+        cardleft=[]
+        for i in range(self.player_num):
+            cardleft.append(len(self.env.game.players[i].hand))
+        infolist.append(cardleft)
+        infolist.append(info['legal_actions'])
+        return infolist
+
+    def print_player_vision(self,id):
+        '''
+        print out things that the player in game should be able to observes in a list of lists of strings
+        for debug purpose
+        Args:
+            id: the player id you want to get vision of    
+        '''
+        info=self.get_player_vision(id)
+        print("Your card:")
+        print(info[0])
+        print("=======================================================================================================")
+        print("Target card:")
+        print(info[1])
+        print("=======================================================================================================")
+        print("Number of cards left: for each players:")
+        for i in info[2]:
+            print(i)
+        print("=======================================================================================================")
+        print("Leagal actions:")
+        print(info[3])
+
+        
 if __name__ == '__main__':
     env=RlUno(4)
+    agents=[]
+    for i in range(env.player_num-1): 
+        agents.append( RandomAgent(action_num=env.action_num))
+    env.set_agents(agents)    
+    env.init_game()
+    env.print_state(0)
+    env.print_player_vision(0)
