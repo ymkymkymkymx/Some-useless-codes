@@ -18,7 +18,7 @@ class RlUno(object):
                 (numpy.array): The begining state of the game
                 (int): The begining player
         '''
-        state, player_id = self.game.init_game()
+        state, player_id = self.env.game.init_game()
         return self.extract_state(state), player_id
 
     def step(self, action):
@@ -66,7 +66,7 @@ class RlUno(object):
         Returns:
             (numpy.array): The observed state of the player
         '''
-        return self.env.extract_state(self.game.get_state(player_id))
+        return self.env.extract_state(self.env.game.get_state(player_id))
 
     def set_agents(self, agents):
         ''' Set the agents that will interact with the environment
@@ -198,3 +198,6 @@ class RlUno(object):
         self.env.player_num=num
         self.env.game.num_players=num
         return self.init_game()
+    
+if __name__ == '__main__':
+    env=RlUno(4)
