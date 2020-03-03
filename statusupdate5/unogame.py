@@ -320,7 +320,7 @@ class RlUno(object):
     
         #trajectories = [[] for _ in range(self.player_num)]
         state, player_id = self.init_game()
-    
+        state=self.env.game.get_state(0)
         # Loop to play the game
         #trajectories[player_id].append(state)
         
@@ -333,7 +333,9 @@ class RlUno(object):
                 next_state, next_player_id =self.env.game.step(action)
              # Agent plays
             else:     
-                action = self.env.agents[humanorai[player_id]].eval_step(state)    
+                action = self.env.agents[humanorai[player_id]].eval_step(state)
+                if action== None:
+                    action='draw'
             # Environment steps
                 next_state, next_player_id = self.env.game.step(action)
                 print("Player {0} takes action: {1}".format(player_id,action))
@@ -349,11 +351,21 @@ class RlUno(object):
 if __name__ == '__main__':
     env=RlUno(4)
     agents=[]
-    for i in range(env.player_num-1): 
+    for i in range(env.player_num): 
         agents.append( RandomAgent(action_num=env.action_num))
     env.set_agents(agents)    
     env.init_game()
     env.print_state(0)
     env.print_player_vision(0)
+    # 4 random agents example
+    print("4 random agents example\n")
+    ishuman=[0,1,2,3]
+    env.gamewithai(ishuman)
+    # 1 human and 3 random agents example
+    print("\n 1 human and 3 random agents example \n")
+    agents=[]
+    for i in range(env.player_num-1): 
+        agents.append( RandomAgent(action_num=env.action_num))   
+    env.set_agents(agents)   
     ishuman=[-1,0,1,2]
     env.gamewithai(ishuman)
