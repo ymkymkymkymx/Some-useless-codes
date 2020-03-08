@@ -320,7 +320,7 @@ class RlUno(object):
     
         #trajectories = [[] for _ in range(self.player_num)]
         state, player_id = self.init_game()
-        state=self.env.game.get_state(0)
+        
         # Loop to play the game
         #trajectories[player_id].append(state)
         
@@ -334,11 +334,10 @@ class RlUno(object):
              # Agent plays
             else:     
                 action = self.env.agents[humanorai[player_id]].eval_step(state)
-                if action== None:
-                    action='draw'
+                
             # Environment steps
-                next_state, next_player_id = self.env.game.step(action)
-                print("Player {0} takes action: {1}".format(player_id,action))
+                next_state, next_player_id = self.env.step(action)
+                print("Player {0} takes action: {1}".format(player_id,self.env.decode_action(action)))
             if self.is_over():
                 print("Player {0} wins".format(player_id))
             # Set the state and player
