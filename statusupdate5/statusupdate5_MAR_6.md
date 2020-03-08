@@ -16,4 +16,4 @@
 * I don't know how many layers and nodes are approximately needed for the game with 420 inputs and 60 outputs.
 
 
-* A link to this page: [https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate5/statusupdate5_MAR_6.md](https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate5/statusupdate5_MAR_5.md)
+* A link to this page: [https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate5/statusupdate5_MAR_6.md](https://github.com/ymkymkymkymx/Some-useless-codes/blob/master/statusupdate5/statusupdate5_MAR_6.md)
