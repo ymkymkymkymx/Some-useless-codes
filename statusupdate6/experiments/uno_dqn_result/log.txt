@@ -1,0 +1,9 @@
+
+########## Evaluation ##########
+Timestep: 72 Average reward is 0.02
+
+########## Evaluation ##########
+Timestep: 4820 Average reward is 0.08
+
+########## Evaluation ##########
+Timestep: 9583 Average reward is 0.048
