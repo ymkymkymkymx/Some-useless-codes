@@ -2,7 +2,7 @@ import rlcard
 from rlcard.agents.random_agent import RandomAgent
 from rlcard.utils.utils import set_global_seed
 from rlcard.utils.utils import *
-
+from dqnmodel import *
 class RlUno(object):
     def __init__(self, playernum=2,human=0):
         self.env= rlcard.make('uno')
@@ -355,21 +355,22 @@ class RlUno(object):
 if __name__ == '__main__':
     env=RlUno(4)
     agents=[]
+    dqn=DqnModel()
     for i in range(env.player_num): 
-        agents.append( RandomAgent(action_num=env.action_num))
+        agents.append(dqn.agent )
     env.set_agents(agents)    
     env.init_game()
     env.print_state(0)
     env.print_player_vision(0)
     # 4 random agents example
-    print("4 random agents example\n")
+    print("4 DQN agents example\n")
     ishuman=[0,1,2,3]
     env.gamewithai(ishuman)
     # 1 human and 3 random agents example
     print("\n 1 human and 3 random agents example \n")
     agents=[]
     for i in range(env.player_num-1): 
-        agents.append( RandomAgent(action_num=env.action_num))   
+        agents.append( dqn.agent)   
     env.set_agents(agents)   
     ishuman=[-1,0,1,2]
     env.gamewithai(ishuman)
