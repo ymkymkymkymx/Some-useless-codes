@@ -17,6 +17,10 @@ norm_step = 100
 
 ## Set a global seed
 ##set_global_seed(0)
+'''
+class Dqnmodel is a packed uno agent which is trained and initiallized and ready to be used directly in unogame.
+./experiments/uno_dqn_result/models/model1.ckpt is where I stored the trained model, if you want use your own model, please change the path to your own model.
+'''
 class DqnModel:
     def __init__(self):
         env=rlcard.make('uno')

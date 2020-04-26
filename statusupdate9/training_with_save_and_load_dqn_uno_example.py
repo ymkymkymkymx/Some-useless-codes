@@ -52,6 +52,7 @@ if True:
 
     sess1.run(tf.global_variables_initializer())
     sess2.run(tf.global_variables_initializer())
+    # initialize session with previously saved models
     saver=tf.train.Saver()
     saver.restore(sess1,root_path+'models/model11.ckpt')
     saver.restore(sess2,root_path+'models/model22.ckpt')      

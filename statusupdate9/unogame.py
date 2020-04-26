@@ -292,7 +292,7 @@ class RlUno(object):
 
     def askhumanforaction(self):
         '''
-        This version is for debug and represent purposes, if you want to use it for webapp, pls replace the input() and printing with proper fucntions
+        This version is for debug and represent purposes, if you want to use it for webapp, pls replace the input() and printing with proper fucntions so that they can send info to the web app.
         return: human action
         '''
         id=self.get_player_id()
@@ -313,6 +313,7 @@ class RlUno(object):
         Args:
              seed: random's seed if provided for agents
              humanorai: a list of size player_num, humanorai[i]==-1 means the i-1 th player is human, huamnorai[i]==a where a >=0 means the i-1 th player is self.env.agents[a]
+                        For instance,  if you set the game self.agents to be [agenta ,agentb, agentc], and you want agenta to be the first player, human to be the second player, agentc to be the 4th player and agentd to be the 3rd player, than you should set humanorai as [0,-1,2,1]. 
         '''
         if seed is not None:
             np.random.seed(seed)

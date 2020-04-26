@@ -40,7 +40,7 @@ if True:
                      state_shape=env.state_shape,
                      mlp_layers=[100,100])
       
-    
+    #load first agent
 
     sess1.run(tf.global_variables_initializer())
     saver=tf.train.Saver()
@@ -57,7 +57,7 @@ if True:
       
     
     sess2.run(tf.global_variables_initializer())
-    
+    #load second agent
     
     saver2=tf.train.Saver()
     saver2.restore(sess2,root_path+'models/model22.ckpt')
